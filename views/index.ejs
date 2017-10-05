@@ -1,0 +1,63 @@
+<html>
+<head>
+  <title></title>
+  <link rel='stylesheet' href='/stylesheets/style.css' />
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script type ="text/javascript" src="/socket.io/socket.io.js"></script>
+  <script type ="text/javascript">
+  $(document). ready(function (){
+    // this triggers the connection event in our server!
+    var socket  = io.connect();
+    // we'll write all the socket stuff after the above line!
+
+    //EMIT data to the server when an event  happend -> The server will be listening for this event
+    $('form').submit(function (){
+      var user_info = {
+        "name" : $("#name").val(),
+        "location" : $("#location").val(),
+        "fav_lang" : $("#fav_lang").val(),
+        "comment" :$("#comment").val()
+      }
+      socket.emit( "form_submitted", {user_info});
+      return false;
+    });
+    //Listening  for the server Response/ Send Data and do Something
+    socket.on( 'server_response', function (data){
+      var num = Math.floor(Math.random()*1000 + 1)
+      var name = data.response.user_info.name
+      var location = data.response.user_info.location
+      var lang = data.response.user_info.lang
+      var comment = data.response.user_info.comment
+      $( ".result" ).html( "<p> You emitted the following information to the server: {name: " +  name + ", location: " + location + ", language: " + lang + ",comment: " + comment +    " , }</p>" );
+      $( ".result" ).append( "<p> your lucky number by the server is " + num + "</p>" );
+      console.log( 'The server says: ',  data.response.user_info);
+    });
+  })
+  </script>
+</head>
+<body>
+  <div class="result">
+
+  </div>
+  <h1>Dojo Survey!</h1>
+   <form class="" method="post">
+     <label for="">Your Name</label>
+     <input id="name" type="text" name="name" value="">
+     <label for="">Dojo Location</label>
+     <select id="location" name="location">
+       <option value="Seatle">Seattle</option>
+       <option value="Washington DC">Washington DC</option>
+       <option value="San Jose">San Jose</option>
+     </select>
+     <label for="">Favorite Lenguage</label>
+     <select id="fav_lang" name="fav_lang">
+       <option value="JavaScript">JavaScript</option>
+       <option value="Pyhton">Python</option>
+       <option value="Ruby">Ruby</option>
+     </select>
+     <p>Coment (Optional)</p>
+     <textarea  id="comment" name="comment"  value="" rows="8" cols="80"></textarea>
+     <button type="submit" name="button">Submit</button>
+   </form>
+</body>
+</html>
